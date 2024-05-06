@@ -1,0 +1,8 @@
+*.tar
+*.tar.gz
+*.RDS
+*.rds
+*.RData
+*.pdf
+.git/*
+*~
