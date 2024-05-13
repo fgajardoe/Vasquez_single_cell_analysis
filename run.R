@@ -23,17 +23,49 @@ IgG.bw %>% as.data.frame %>% tibble %>% pull(score) %>% summary
 #   4.00    4.00    9.00   10.66   13.00 1355.00 
 
 
-# # Creamos un ID para cada rango en el objeto GenomicRanges
-
-IgG.bw=IgG.bw %>% as.data.frame %>% tibble %>% mutate(ID=paste0("IGG",1:NROW(.)))
-ogt.bw=ogt.bw %>% as.data.frame %>% tibble %>% mutate(ID=paste0("OGT",1:NROW(.)))
 
 
+# # Aplicar filtro por cromosoma (xq el Mac no se la puede con mas)
+whichChr="chr10"
+IgG.bw=IgG.bw[seqnames(IgG.bw)==whichChr]
+ogt.bw=ogt.bw[seqnames(ogt.bw)==whichChr]
+
+# # Creamos un ID para cada rango en el objeto GenomicRanges -> candidato a ser borrado
+IgG.ids=IgG.bw %>% as.data.frame %>% tibble %>% mutate(ID=paste0("IGG",1:NROW(.))) %>% pull(ID)
+names(IgG.bw)=IgG.ids
+IgG.bw$ID=IgG.ids
+
+ogt.ids=ogt.bw %>% as.data.frame %>% tibble %>% mutate(ID=paste0("OGT",1:NROW(.))) %>% pull(ID)
+names(ogt.bw)=ogt.ids
+ogt.bw$ID=ogt.ids
 
 # # Aplicar filtro por score
-scoreCutoff=6
-IgG.valid_ranges=IgG.bw %>% as.data.frame %>% tibble %>% filter(score>scoreCutoff) %>% pull(ID)
-ogt.valid_ranges=ogt.bw %>% as.data.frame %>% tibble %>% filter(score>scoreCutoff) %>% pull(ID)
+# IgG
+scoreCutoff=10
+IgG.tibble=IgG.bw %>% as.data.frame %>% tibble 
+Ninicial=IgG.tibble %>% NROW
+IgG.tibble=IgG.tibble %>% filter(score>scoreCutoff)
+Nfinal=IgG.tibble %>% NROW
+removedPerc=100-(Nfinal*100/Ninicial)
+cat(paste0("Removed percentage (IgG): ",removedPerc," %"))
+IgG.ids.overScoreCutoff=IgG.tibble %>% pull(ID)
+
+gc()
+
+# OGT
+scoreCutoff=10
+ogt.tibble=ogt.bw %>% as.data.frame %>% tibble 
+Ninicial=ogt.tibble %>% NROW
+ogt.tibble=ogt.tibble %>% filter(score>scoreCutoff)
+Nfinal=ogt.tibble %>% NROW
+removedPerc=100-(Nfinal*100/Ninicial)
+cat(paste0("Removed percentage (OGT): ",removedPerc," %"))
+ogt.ids.overScoreCutoff=ogt.tibble %>% pull(ID)
+gc()
+
+# Filter GenomicRanges by Score
+IgG.bw=IgG.bw[IgG.ids.overScoreCutoff]
+ogt.bw=ogt.bw[ogt.ids.overScoreCutoff]
 
 
 
