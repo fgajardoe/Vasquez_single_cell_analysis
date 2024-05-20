@@ -64,10 +64,49 @@ ogt.ids.overScoreCutoff=ogt.tibble %>% pull(ID)
 gc()
 
 # Filter GenomicRanges by Score
+ogt.len.i=ogt.bw %>% length
+IgG.len.i=IgG.bw %>% length
 IgG.bw=IgG.bw[IgG.ids.overScoreCutoff]
 ogt.bw=ogt.bw[ogt.ids.overScoreCutoff]
+ogt.len.f=ogt.bw %>% length
+IgG.len.f=IgG.bw %>% length
+ogt.percentFiltered=(ogt.len.i-ogt.len.f)*100/ogt.len.i
+IgG.percentFiltered=(IgG.len.i-IgG.len.f)*100/IgG.len.i
 
 
+# merge redundant ranges
+ogt.bw=GenomicRanges::reduce(ogt.bw)
+IgG.bw=GenomicRanges::reduce(IgG.bw)
+
+# nuevos IDs para los rangos en el objeto reducido
+IgG.ids=IgG.bw %>% as.data.frame %>% tibble %>% mutate(ID=paste0("IGGR",1:NROW(.))) %>% pull(ID)
+names(IgG.bw)=IgG.ids
+IgG.bw$ID=IgG.ids
+# nuevos IDs para los rangos en el objeto reducido
+ogt.ids=ogt.bw %>% as.data.frame %>% tibble %>% mutate(ID=paste0("OGTR",1:NROW(.))) %>% pull(ID)
+names(ogt.bw)=ogt.ids
+ogt.bw$ID=ogt.ids
+
+
+
+
+
+
+
+# calculate overlapping
+o=findOverlapPairs(ogt.bw, IgG.bw)
+ogt.unwantedIDs=o@first %>% data.frame %>% tibble %>% pull(ID)
+
+
+# exclude overlapping ranges. Keep only (OGT) ranges that do not overlap IgG.
+`%notin%` <<- Negate(`%in%`)
+ogt.bw=ogt.bw[ogt.bw$ID %notin% ogt.unwantedIDs]
+
+library(TxDb.Mmusculus.UCSC.mm9.knownGene)
+txdb=TxDb.Mmusculus.UCSC.mm9.knownGene
+
+promoters=txdb %>% promoters
+o.counts=countOverlaps(ogt.bw,promoters)
 
 
 save.image("run.RData")
