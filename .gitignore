@@ -6,3 +6,11 @@
 *.pdf
 .git/*
 *~
+*.DS_Store
+*.Rhistory
+*.lesshst
+*.tsv
+*.txt
+*.txt.gz
+*.doc
+*.matrix
