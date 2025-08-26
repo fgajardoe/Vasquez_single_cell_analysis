@@ -1,5 +1,6 @@
 library(tidyverse)
 library(limma)
+library(ggsignif)
 
 
 # Frase tipo:
@@ -88,15 +89,18 @@ pdf("run.pdf")
 
 gene="228906_at" #"TET1"
 toPlot=generateBoxPlot(d.ready,eq,gene)
-toPlot %>% ggplot(aes(x=Leukemia_class, y=Intensity, fill=Leukemia_class))+geom_boxplot()+ggtitle("TET1")
+toPlot %>% ggplot(aes(x=Leukemia_class, y=Intensity, fill=Leukemia_class))+geom_boxplot()+ggtitle("TET1")+  
+	geom_signif( comparisons = list(c("leukemia class: Non-leukemia and healthy bone marrow", "leukemia class: T-ALL")), map_signif_level = TRUE, textsize = 6 )
 
 gene="1559856_s_at" #KMT2A
 toPlot=generateBoxPlot(d.ready,eq,gene)
-toPlot %>% ggplot(aes(x=Leukemia_class, y=Intensity, fill=Leukemia_class))+geom_boxplot()+ggtitle("KMT2A")
+toPlot %>% ggplot(aes(x=Leukemia_class, y=Intensity, fill=Leukemia_class))+geom_boxplot()+ggtitle("KMT2A")+
+	geom_signif( comparisons = list(c("leukemia class: Non-leukemia and healthy bone marrow", "leukemia class: T-ALL")), map_signif_level = TRUE, textsize = 6 )
 
 gene="207563_s_at" #OGT
 toPlot=generateBoxPlot(d.ready,eq,gene)
-toPlot %>% ggplot(aes(x=Leukemia_class, y=Intensity, fill=Leukemia_class))+geom_boxplot()+ggtitle("OGT")
+toPlot %>% ggplot(aes(x=Leukemia_class, y=Intensity, fill=Leukemia_class))+geom_boxplot()+ggtitle("OGT")+
+	geom_signif( comparisons = list(c("leukemia class: Non-leukemia and healthy bone marrow", "leukemia class: T-ALL")), map_signif_level = TRUE, textsize = 6 )
 
 
 dev.off()
